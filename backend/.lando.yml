@@ -1,0 +1,16 @@
+name: cursach-backend
+recipe: lamp
+env_file:
+  - .env
+config:
+  php: 8.2
+  webroot: api
+  database: mysql:8.0
+
+services:
+  phpmyadmin:
+    type: phpmyadmin
+
+  appserver:
+    overrides:
+      build: .
