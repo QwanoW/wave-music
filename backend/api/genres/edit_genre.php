@@ -1,4 +1,6 @@
 <?php
+// TODO: REWRITE WITH TRY CATCH
+
 require_once getenv('LANDO_MOUNT') . '/vendor/autoload.php';
 
 App\Middleware::admin_route();
@@ -8,22 +10,22 @@ if (isset($_POST['id']) && isset($_POST['name'])) {
   $name = $_POST['name'];
 
   $db = new \App\Database();
-  $genreDB = new \App\Objects\Genre($db->getConnection());
+  $trackDB = new \App\Objects\Genre($db->getConnection());
 
-  $genre = $genreDB->getById($id);
+  $artist = $trackDB->getById($id);
 
-  $oldCover = $genre['cover_uri'];
+  $oldPhoto = $artist['cover_uri'];
 
   if (isset($_FILES['cover']) && $_FILES['cover']['error'] === UPLOAD_ERR_OK) {
-    $cover = $_FILES['cover'];
-    $cover_name = App\Services\ImageService::save_image($cover);
+    $photo = $_FILES['cover'];
+    $photo_uri = App\Services\ImageService::save_image($photo);
   } else {
-    $cover_name = $oldCover;
+    $photo_uri = $oldPhoto;
   }
 
-  $ok = $genreDB->update(['id' => $id, 'name' => $name, 'cover_uri' => $cover_name]);
+  $id = $trackDB->update(['id' => $id, 'name' => $name, 'cover_uri' => $photo_uri]);
 
-  if (!$ok) {
+  if (!$id) {
     http_response_code(500);
 
     echo json_encode([

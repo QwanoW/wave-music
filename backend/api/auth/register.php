@@ -1,4 +1,6 @@
 <?php
+// TODO: ПЕРЕПИСАТЬ ПО ЧЕЛОВЕСКИ
+
 require_once getenv('LANDO_MOUNT') . '/vendor/autoload.php';
 
 if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {

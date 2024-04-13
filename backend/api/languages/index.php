@@ -4,8 +4,8 @@ require_once getenv('LANDO_MOUNT') . '/vendor/autoload.php';
 App\Middleware::admin_route();
 
 $db = new \App\Database();
-$genreDB = new \App\Objects\Genre($db->getConnection());
+$languageDB = new \App\Objects\Language($db->getConnection());
 
-$genres = $genreDB->getAll();
+$languages = $languageDB->getAll();
 
-echo json_encode($genres);
+echo json_encode($languages);

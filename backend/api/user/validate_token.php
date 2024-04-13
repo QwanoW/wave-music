@@ -1,6 +1,6 @@
 <?php
+// TODO: ПЕРЕПИСАТЬ ПО ЧЕЛОВЕСКИ
 
-// TODO: REWRITE WITH TOKEN SERVICE
 require_once getenv('LANDO_MOUNT') . '/vendor/autoload.php';
 
 use App\Utils;

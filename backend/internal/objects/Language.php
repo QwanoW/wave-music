@@ -28,19 +28,17 @@ class Language extends Table
     return $this->fetchAll($query);
   }
 
-  public function insert(string $name, string $cover)
+  public function insert(string $name)
   {
     $query = "INSERT INTO " . $this->table_name . "(name) VALUES (:name)";
 
-    return $this->execute($query, ["name" => $name]);
+    return $this->executeWithId($query, ["name" => $name]);
   }
 
   public function update($data)
   {
     $query = "UPDATE " . $this->table_name . " SET name = :name WHERE id = :id";
 
-
-    
     return $this->execute($query, $data);
   }
 

@@ -30,7 +30,7 @@ class AudioService
     $audio_format = new FFMpeg\Format\Audio\Mp3();
     $file->save($audio_format, $directory . '/index.m3u8');
 
-    return str_replace(getenv('WEB_ROOT'), '', $directory) . '/index.m3u8';
+    return str_replace(getenv('LANDO_MOUNT') . '/api', '', $directory) . '/index.m3u8';
   }
 
   static function get_audio_duration($file_name)

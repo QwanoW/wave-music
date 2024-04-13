@@ -34,7 +34,17 @@ class ImageService
 
   static function save_image($file)
   {
-    self::validate_image($file);
+    $error = self::validate_image($file);
+
+    if ($error) {
+      http_response_code(400);
+
+      echo json_encode([
+        'message' => $error,
+      ]);
+
+      exit();
+    }
 
     $unique_name = uniqid();
 

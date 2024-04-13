@@ -3,37 +3,26 @@ require_once getenv('LANDO_MOUNT') . '/vendor/autoload.php';
 
 App\Middleware::admin_route();
 
-if (isset($_POST['id']) && isset($_POST['name'])) {
+$db = new \App\Database();
+$languageDB = new \App\Objects\Language($db->getConnection());
+
+if (isset($_POST['id'])) {
   $id = $_POST['id'];
   $name = $_POST['name'];
 
-  $db = new \App\Database();
-  $genreDB = new \App\Objects\Genre($db->getConnection());
+  $id = $languageDB->update(['id' => $id, 'name' => $name]);
 
-  $genre = $genreDB->getById($id);
-
-  $oldCover = $genre['cover_uri'];
-
-  if (isset($_FILES['cover']) && $_FILES['cover']['error'] === UPLOAD_ERR_OK) {
-    $cover = $_FILES['cover'];
-    $cover_name = App\Services\ImageService::save_image($cover);
-  } else {
-    $cover_name = $oldCover;
-  }
-
-  $ok = $genreDB->update(['id' => $id, 'name' => $name, 'cover_uri' => $cover_name]);
-
-  if (!$ok) {
+  if (!$id) {
     http_response_code(500);
 
     echo json_encode([
-      'message' => 'Не удалось изменить жанр'
+      'message' => 'Не удалось изменить язык'
     ]);
   } else {
     http_response_code(200);
 
     echo json_encode([
-      'message' => 'Жанр изменен',
+      'message' => 'Язык изменен',
     ]);
   }
 } else {

@@ -1,11 +1,13 @@
 <?php
+// TODO: REWRITE WITH TRY CATCH
+
 require_once getenv('LANDO_MOUNT') . '/vendor/autoload.php';
 
 App\Middleware::admin_route();
 
 $db = new \App\Database();
-$genreDB = new \App\Objects\Genre($db->getConnection());
+$trackDB = new \App\Objects\Genre($db->getConnection());
 
-$genres = $genreDB->getAll();
+$genres = $trackDB->getAll();
 
 echo json_encode($genres);

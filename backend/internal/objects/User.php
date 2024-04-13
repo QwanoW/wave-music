@@ -1,5 +1,5 @@
 <?php
-// TODO: переписать наследуясь от класса Table
+// TODO: ПЕРЕПИСАТЬ ПО ЧЕЛОВЕЧЕСКИ
 
 namespace App\Objects;
 

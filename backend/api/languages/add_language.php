@@ -3,36 +3,26 @@ require_once getenv('LANDO_MOUNT') . '/vendor/autoload.php';
 
 App\Middleware::admin_route();
 
-if (isset($_POST['name']) || isset($_FILES['cover'])) {
+if (isset($_POST['name'])) {
   $name = $_POST['name'];
-  $cover = $_FILES['cover'];
 
-  $cover_name = App\Services\ImageService::save_image($cover);
+  $db = new \App\Database();
+  $languageDB = new \App\Objects\Language($db->getConnection());
 
-  if ($cover_name) {
-    $db = new \App\Database();
-    $genreDB = new \App\Objects\Genre($db->getConnection());
+  $id = $languageDB->insert($name);
 
-    $ok = $genreDB->insert($name, $cover_name);
-
-    if (!$ok) {
-      http_response_code(500);
-
-      echo json_encode([
-        'message' => 'Не удалось добавить жанр'
-      ]);
-    } else {
-      http_response_code(200);
-
-      echo json_encode([
-        'message' => 'Жанр добавлен',
-      ]);
-    }
-  } else {
+  if (!$id) {
     http_response_code(500);
 
     echo json_encode([
-      'message' => 'Не удалось загрузить обложку'
+      'message' => 'Не удалось добавить язык'
+    ]);
+  } else {
+    http_response_code(200);
+
+    echo json_encode([
+      'message' => 'Язык добавлен',
+      'id' => $id
     ]);
   }
 } else {
