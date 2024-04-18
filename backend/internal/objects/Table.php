@@ -19,7 +19,13 @@ class Table
   {
     $stmt = $this->db->prepare($query);
     $stmt->execute($params);
-    return $stmt->fetch();
+    $result = $stmt->fetch();
+    
+    if ($result === false) {
+      return [];
+    }
+
+    return $result;
   }
 
   public function execute(string $query, array $params = []): bool

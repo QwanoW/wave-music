@@ -16,7 +16,7 @@ if (isset($_POST['title']) && isset($_POST['tracks']) && isset($_FILES['cover'])
   $pdo->beginTransaction();
 
   try {
-    $albumDB = new \App\Objects\Album($pdo);
+    $playlistDB = new \App\Objects\Album($pdo);
     $albumTrackDB = new \App\Objects\AlbumTrack($pdo);
 
     $cover_uri = App\Services\ImageService::save_image($cover);
@@ -25,10 +25,10 @@ if (isset($_POST['title']) && isset($_POST['tracks']) && isset($_FILES['cover'])
       throw new Exception("Не удалось загрузить обложку");
     }
 
-    $album_id = $albumDB->insert(['title' => $title, 'cover_uri' => $cover_uri]);
+    $album_id = $playlistDB->insert(['title' => $title, 'cover_uri' => $cover_uri]);
 
-    foreach ($tracks as $track) {
-      $albumTrackDB->insert(['track_id' => $track['id'], 'album_id' => $album_id, 'order' => $track['order']]);
+    foreach ($tracks as $playlist) {
+      $albumTrackDB->insert(['track_id' => $playlist['id'], 'album_id' => $album_id, 'order' => $playlist['order']]);
     }
 
     $pdo->commit();

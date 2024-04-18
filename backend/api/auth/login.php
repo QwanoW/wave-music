@@ -1,66 +1,74 @@
 <?php
-// TODO: ПЕРЕПИСАТЬ ПО ЧЕЛОВЕСКИ
-
 require_once getenv('LANDO_MOUNT') . '/vendor/autoload.php';
+
+use \App\Services\TokenService;
 
 if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
   exit();
 }
 
-use App\Database;
-use App\Objects\User;
+if (isset($_POST['email']) && isset($_POST['password'])) {
+  $email = $_POST['email'];
+  $password = $_POST['password'];
 
-use Firebase\JWT\JWT;
+  try {
+    $database = new \App\Database();
+    $db = $database->getConnection();
 
-// Получаем соединение с базой данных
-$database = new Database();
-$db = $database->getConnection();
+    $user = new \App\Objects\User($db);
 
-// Создание объекта "User"
-$user = new User($db);
+    $user = $user->getByEmail($email);
 
-// Получаем данные
-$data = json_decode(file_get_contents("php://input"));
+    if (!$user || !password_verify($password, $user['password'])) {
+      http_response_code(401);
 
-// Устанавливаем значения
-$user->email = $data->email;
-$email_exists = $user->emailExists();
+      echo json_encode(
+        ['message' => 'Неверный логин или пароль']
+      );
+    }
+    ;
 
-// Существует ли электронная почта и соответствует ли пароль тому, что находится в базе данных
-if ($email_exists && password_verify($data->password, $user->password)) {
+    $token = [
+      "exp" => time() + 7 * 24 * 3600,
+      "data" =>
+        [
+          "id" => $user['id'],
+          "username" => $user['username'],
+          "email" => $user['email'],
+          "role" => $user['role'],
+          "created_at" => $user['created_at'],
+        ],
+    ];
 
-  $token = array(
-    "exp" => time() + 7 * 24 * 3600,
-    "data" => array(
-      "id" => $user->id,
-      "username" => $user->username,
-      "email" => $user->email,
-      "role" => $user->role,
-      "isArtist" => $user->isArtist,
-      "created_at" => $user->created_at
-    )
-  );
+    $jwt = TokenService::encode_jwt($token);
 
-  // Код ответа
-  http_response_code(200);
+    if ($jwt) {
+      http_response_code(200);
 
-  // Создание jwt
-  $jwt = JWT::encode($token, getenv('JWT_SECRET'), 'HS256');
+      echo json_encode(
+        [
+          "message" => "Успешный вход в систему",
+          "jwt" => $jwt
+        ]
+      );
+    } else {
+      http_response_code(500);
+
+      echo json_encode(
+        ['message' => 'Не удалось создать токен']
+      );
+    }
+  } catch (Exception $e) {
+    http_response_code(500);
+
+    echo json_encode(
+      ['message' => $e->getMessage()]
+    );
+  }
+} else {
+  http_response_code(400);
+
   echo json_encode(
-    array(
-      "message" => "Успешный вход в систему",
-      "jwt" => $jwt
-    )
+    ['message' => 'Неверные данные']
   );
-}
-
-// Если электронная почта не существует или пароль не совпадает,
-// Сообщим пользователю, что он не может войти в систему
-else {
-
-  // Код ответа
-  http_response_code(401);
-
-  // Скажем пользователю что войти не удалось
-  echo json_encode(array("message" => "Неправильный логин или пароль"));
 }

@@ -6,10 +6,13 @@ App\Middleware::admin_route();
 
 if (
   isset($_POST['id']) && isset($_POST['title']) && isset($_POST['description']) && isset($_POST['tracks'])
+  && isset($_POST['user_id']) && isset($_POST['is_private'])
 ) {
   $id = $_POST['id'];
   $title = $_POST['title'];
   $description = $_POST['description'];
+  $user_id = $_POST['user_id'];
+  $is_private = (bool) $_POST['is_private'];
 
   $cover = $_FILES['cover'] ?? null;
   $tracks = $_POST['tracks'];
@@ -20,7 +23,7 @@ if (
   $pdo->beginTransaction();
 
   try {
-    $albumDB = new \App\Objects\Playlist($pdo);
+    $playlistDB = new \App\Objects\Playlist($pdo);
     $playlistTrackDB = new \App\Objects\PlaylistTrack($pdo);
 
     // if new cover is present then save it, else use old one
@@ -31,11 +34,11 @@ if (
         throw new Exception("Не удалось загрузить обложку");
       }
     } else {
-      $playlist = $albumDB->getById($id);
+      $playlist = $playlistDB->getById($id);
       $cover_uri = $playlist['cover_uri'];
     }
 
-    $albumDB->update(['id' => $id, 'title' => $title, 'description' => $description, 'cover_uri' => $cover_uri]);
+    $playlistDB->update(['id' => $id, 'title' => $title, 'description' => $description, 'cover_uri' => $cover_uri, 'user_id' => $user_id, 'is_private' => $is_private]);
 
     // delete previous tracks and insert new
     $playlistTrackDB->deleteAllByPlaylistId($id);
@@ -51,6 +54,8 @@ if (
       'message' => 'Плейлист обновлен',
     ]);
   } catch (\Exception $e) {
+    var_dump($e->getMessage());
+
     $pdo->rollBack();
 
     http_response_code(500);

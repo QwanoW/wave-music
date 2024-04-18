@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Home, Search, LibraryBig, Settings, ArrowLeft } from 'lucide-vue-next';
+import { Home, Search, LibraryBig, Settings, AudioLines } from 'lucide-vue-next';
 import { RouterLink } from 'vue-router/auto';
 
 const navItems = [
@@ -19,19 +19,24 @@ const navItems = [
     icon: LibraryBig,
   },
 ];
+
+defineProps<{ isCollapsed: boolean }>();
 </script>
 
 <template>
-  <div class="p-5 h-full flex flex-col justify-between bg-orange-300 rounded-sm">
+  <aside class="p-5 h-full flex flex-col justify-between bg-orange-300 rounded-sm">
     <div class="flex flex-col gap-y-10">
-      <h1 class="text-center text-2xl font-bold text-white relative">
+      <div class="text-center text-2xl font-bold text-white relative">
         <RouterLink
-          to="/"
-          class="bg-amber-600/30 hover:bg-amber-600 text-amber-600 hover:text-white transition-colors cursor-pointer p-2 rounded-lg absolute left-0 top-[50%] translate-y-[-50%]">
-          <ArrowLeft :size="32" :stroke-width="2" />
+          class="w-full h-full flex items-center justify-center"
+          v-if="isCollapsed"
+          to="/">
+          <AudioLines class="w-10 h-10" stroke-width="2" />
         </RouterLink>
-        Vue Music
-      </h1>
+        <h1 v-else class="text-center text-3xl font-bold text-white">
+          <RouterLink to="/">Wave Music</RouterLink>
+        </h1>
+      </div>
       <ul class="flex flex-col gap-y-2">
         <RouterLink v-for="item in navItems" :to="'/player' + item.href">
           <li
@@ -44,19 +49,23 @@ const navItems = [
             ">
             <component
               :is="item.icon"
-              :class="item.href === $route.path ? 'text-amber-600' : 'text-white'" />
-            {{ item.label }}
+              :class="[
+                item.href === $route.path ? 'text-amber-600' : 'text-white',
+                isCollapsed ? 'w-full' : '',
+              ]" />
+            {{ isCollapsed ? '' : item.label }}
           </li>
         </RouterLink>
       </ul>
     </div>
     <div
-      class="self-end p-2 rounded-lg hover:bg-orange-900/15 text-white hover:text-amber-600 cursor-pointer transition-colors">
-      <RouterLink to="/player/settings">
-        <Settings />
+      :class="isCollapsed ? 'w-full' : ''"
+      class="p-4 self-end rounded-lg hover:bg-orange-900/15 text-white hover:text-amber-600 cursor-pointer transition-colors">
+      <RouterLink class="w-full h-full" to="/player/settings">
+        <Settings :class="isCollapsed ? 'w-full' : ''" />
       </RouterLink>
     </div>
-  </div>
+  </aside>
 </template>
 
 <style scoped></style>

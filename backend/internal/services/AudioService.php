@@ -21,10 +21,10 @@ class AudioService
     $file = $ffmpeg->open($file_name);
     $file->addFilter(new \FFMpeg\Filters\Audio\SimpleFilter([
       "-vn",
-      "-hls_list_size",
-      "0",
-      "-hls_time",
-      "30",
+      "-acodec", "aac", // Кодирование аудио в AAC
+      "-hls_list_size", "0",
+      "-hls_time", "30", // Длительность сегмента HLS
+      "-preset", "fast" // Добавление быстрого пресета
     ]));
 
     $audio_format = new FFMpeg\Format\Audio\Mp3();

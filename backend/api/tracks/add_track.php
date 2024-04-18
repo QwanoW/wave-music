@@ -58,7 +58,7 @@ if (
     http_response_code(500);
 
     echo json_encode([
-      'message' => 'Не удалось загрузить трек'
+      'message' => $e->getMessage()
     ]);
   }
 } else {

@@ -25,7 +25,7 @@ import Footer from '@/components/partials/Footer.vue';
           </Transition>
           <Transition name="description" appear>
             <p class="text-base text-gray-400 max-w-sm transition-all duration-1000 delay-200">
-              Добро пожаловать в <span class="font-semibold text-orange-600">Vue Music</span>, вашу
+              Добро пожаловать в <span class="font-semibold text-orange-600">Wave Music</span>, вашу
               платформу для стриминга и открытия потрясающей музыки.
             </p>
           </Transition>

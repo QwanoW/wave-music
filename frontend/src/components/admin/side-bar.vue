@@ -1,6 +1,16 @@
 <script setup lang="ts">
 import { RouterLink } from 'vue-router/auto';
-import { Home, AudioLines, Music, Music2 } from 'lucide-vue-next';
+import {
+  Home,
+  AudioLines,
+  Music,
+  Music2,
+  LanguagesIcon,
+  User,
+  UserPlus,
+  PlayCircleIcon,
+  LucideDiscAlbum,
+} from 'lucide-vue-next';
 
 import {
   Accordion,
@@ -16,12 +26,12 @@ const accordionNavigation = [
       {
         title: 'Треки',
         icon: Music,
-        href: '/admin/songs',
+        href: '/admin/tracks',
       },
       {
         title: 'Добавить трек',
         icon: Music2,
-        href: '/admin/songs/add',
+        href: '/admin/tracks/add',
       },
     ],
   },
@@ -37,6 +47,61 @@ const accordionNavigation = [
         title: 'Добавить жанр',
         icon: Music2,
         href: '/admin/genres/add',
+      },
+    ],
+  },
+  {
+    title: 'Языки',
+    children: [
+      {
+        title: 'Языки',
+        icon: LanguagesIcon,
+        href: '/admin/languages',
+      },
+    ],
+  },
+  {
+    title: 'Исполнители',
+    children: [
+      {
+        title: 'Исполнители',
+        icon: User,
+        href: '/admin/artists',
+      },
+      {
+        title: 'Добавить исполнителя',
+        icon: UserPlus,
+        href: '/admin/artists/add',
+      },
+    ],
+  },
+  {
+    title: 'Плейлисты',
+    children: [
+      {
+        title: 'Плейлисты',
+        icon: PlayCircleIcon,
+        href: '/admin/playlists',
+      },
+      {
+        title: 'Добавить плейлист',
+        icon: PlayCircleIcon,
+        href: '/admin/playlists/add',
+      },
+    ],
+  },
+  {
+    title: 'Альбомы',
+    children: [
+      {
+        title: 'Альбомы',
+        icon: LucideDiscAlbum,
+        href: '/admin/albums',
+      },
+      {
+        title: 'Добавить альбом',
+        icon: LucideDiscAlbum,
+        href: '/admin/albums/add',
       },
     ],
   },

@@ -1,173 +1,53 @@
 <?php
-// TODO: ПЕРЕПИСАТЬ ПО ЧЕЛОВЕЧЕСКИ
-
 namespace App\Objects;
 
-use PDO;
-
-class User
+class User extends Table
 {
-  // Подключение к БД таблице "user"
-  private $conn;
   private $table_name = "user";
-
-  // Свойства
-  public $id;
-  public $username;
-  public $email;
-  public $password;
-  public $role;
-  public $isArtist;
-  public $created_at;
-  public $auth_type;
-
-  // Конструктор класса User
-  public function __construct($db)
+  public function __construct(private $db)
   {
-    $this->conn = $db;
+    parent::__construct($db);
   }
 
-  // Метод для создания нового пользователя
-  function create()
+  public function getById(int $id)
   {
+    $query = "SELECT * FROM " . $this->table_name . " WHERE id = :id";
 
-    // Запрос для добавления нового пользователя в БД
-    $query = "INSERT INTO " . $this->table_name . "
-                SET
-                    username = :username,
-                    email = :email,
-                    password = :password";
-
-    // Подготовка запроса
-    $stmt = $this->conn->prepare($query);
-
-    // Инъекция
-    $this->username = htmlspecialchars(strip_tags($this->username));
-    $this->email = htmlspecialchars(strip_tags($this->email));
-    $this->password = htmlspecialchars(strip_tags($this->password));
-
-    // Привязываем значения
-    $stmt->bindParam(":username", $this->username);
-    $stmt->bindParam(":email", $this->email);
-
-    // Для защиты пароля
-    // Хешируем пароль перед сохранением в базу данных
-    $password_hash = password_hash($this->password, PASSWORD_BCRYPT);
-    $stmt->bindParam(":password", $password_hash);
-
-    // Выполняем запрос
-    // Если выполнение успешно, то информация о пользователе будет сохранена в базе данных
-    if ($stmt->execute()) {
-      return true;
-    }
-
-    return false;
+    return $this->fetchOne($query, ["id" => $id]);
   }
 
-  function createOauth()
+  public function getByEmail(string $email)
   {
-    // Запрос для добавления нового пользователя в БД
-    $query = "INSERT INTO " . $this->table_name . "
-        SET
-            username = :username,
-            email = :email,
-            auth_type = :auth_type";
+    $query = "SELECT * FROM " . $this->table_name . " WHERE email = :email";
 
-    // Подготовка запроса
-    $stmt = $this->conn->prepare($query);
-
-    // Инъекция
-    $this->username = htmlspecialchars(strip_tags($this->username));
-    $this->email = htmlspecialchars(strip_tags($this->email));
-    $this->auth_type = htmlspecialchars(strip_tags($this->auth_type));
-
-    // Привязываем значения
-    $stmt->bindParam(":username", $this->username);
-    $stmt->bindParam(":email", $this->email);
-    $stmt->bindParam(":auth_type", $this->auth_type);
-
-    // Выполняем запрос
-    // Если выполнение успешно, то информация о пользователе будет сохранена в базе данных
-    if ($stmt->execute()) {
-      $this->id = $this->conn->lastInsertId();
-
-      return true;
-    }
-
-    return false;
+    return $this->fetchOne($query, ["email" => $email]);
   }
 
-  function readOne()
+  public function getAll()
   {
+    $query = "SELECT id, username, email, created_at, role FROM " . $this->table_name;
 
-    $query = "SELECT id, username, email, role, isArtist, created_at, auth_type FROM " . $this->table_name . " WHERE id = ? LIMIT 0,1";
-
-    $stmt = $this->conn->prepare($query);
-
-    $stmt->bindParam(1, $this->id);
-
-    if ($stmt->execute()) {
-      $row = $stmt->fetch(PDO::FETCH_ASSOC);
-
-      $this->username = $row['username'];
-      $this->email = $row['email'];
-      $this->role = $row['role'];
-      $this->isArtist = $row['isArtist'];
-      $this->created_at = $row['created_at'];
-      $this->auth_type = $row['auth_type'];
-
-      return true;
-    } else {
-      return false;
-    }
+    return $this->fetchAll($query);
   }
 
-  // Проверка, существует ли электронная почта в нашей базе данных
-  function emailExists()
+  public function insert(string $username, string $email, string | null $password, string $auth_type = 'credentials')
   {
+    $query = "INSERT INTO " . $this->table_name . "(username, email, password, auth_type) VALUES (:username, :email, :password, :auth_type)";
 
-    // Запрос, чтобы проверить, существует ли электронная почта
-    $query = "SELECT id, username, password, role, isArtist, created_at, auth_type
-          FROM " . $this->table_name . "
-          WHERE email = ?
-          LIMIT 0,1";
+    return $this->executeWithId($query, ["username" => $username, "email" => $email, "password" => $password, "auth_type" => $auth_type]);
+  }
 
-    // Подготовка запроса
-    $stmt = $this->conn->prepare($query);
+  public function update($data)
+  {
+    $query = "UPDATE " . $this->table_name . " SET username = :username, email = :email, password = :password, auth_type = :auth_type WHERE id = :id";
 
-    // Инъекция
-    $this->email = htmlspecialchars(strip_tags($this->email));
+    return $this->execute($query, $data);
+  }
 
-    // Привязываем значение e-mail
-    $stmt->bindParam(1, $this->email);
+  public function delete(int $id)
+  {
+    $query = "DELETE FROM " . $this->table_name . " WHERE id = :id";
 
-    // Выполняем запрос
-    $stmt->execute();
-
-    // Получаем количество строк
-    $num = $stmt->rowCount();
-
-    // Если электронная почта существует,
-    // Присвоим значения свойствам объекта для легкого доступа и использования для php сессий
-    if ($num > 0) {
-
-      // Получаем значения
-      $row = $stmt->fetch(PDO::FETCH_ASSOC);
-
-      // Присвоим значения свойствам объекта
-      $this->id = $row["id"];
-      $this->username = $row["username"];
-      $this->password = $row["password"];
-      $this->role = $row["role"];
-      $this->isArtist = $row["isArtist"];
-      $this->created_at = $row["created_at"];
-      $this->auth_type = $row["auth_type"];
-
-      // Вернём "true", потому что в базе данных существует электронная почта
-      return true;
-    }
-
-    // Вернём "false", если адрес электронной почты не существует в базе данных
-    return false;
+    return $this->execute($query, ["id" => $id]);
   }
 }

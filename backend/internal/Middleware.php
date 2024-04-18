@@ -50,7 +50,7 @@ class Middleware
       exit;
     }
 
-    return $decoded;
+    return $decoded->data;
   }
 
   static function admin_route()

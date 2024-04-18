@@ -9,22 +9,20 @@ import FormSuccess from '@/components/form-success.vue';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import Button from '@/components/ui/button/Button.vue';
-import { editGenreSchema } from '@/schemas/index';
+import { editGenreSchema, editGenreSchemaType } from '@/schemas/index';
 import api from '@/lib/axios';
 import { API_URL } from '@/constants/index';
 import { getURL } from '@/lib/utils';
+import { Genre } from '@/constants/types';
 
-const updateGenre = inject<(id: number, name: string, cover?: File) => void>('updateGenre');
+const onUpdate = inject<(updatedGenre: editGenreSchemaType) => void>('onUpdate');
 
-const props = defineProps<{
-  id: number;
-  name: string;
-  cover_uri: string;
-}>();
+const props = defineProps<Genre>();
 
 const form = useForm({
   validationSchema: editGenreSchema,
   initialValues: {
+    id: props.id,
     name: props.name,
   },
 });
@@ -36,11 +34,11 @@ const successMessage = ref('');
 const onSubmit = form.handleSubmit((values) => {
   isLoading.value = true;
   api
-    .postForm('/genres/edit_genre.php', { ...values, id: props.id })
+    .postForm('/genres/edit_genre.php', values)
     .then((resp) => {
       successMessage.value = resp.data.message;
-      if (updateGenre) {
-        updateGenre(props.id, values.name, values.cover);
+      if (onUpdate) {
+        onUpdate(values);
       }
     })
     .catch((error) => {

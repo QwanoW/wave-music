@@ -30,14 +30,14 @@ class Playlist extends Table
 
   public function insert($data)
   {
-    $query = "INSERT INTO " . $this->table_name . "(title, description, cover_uri) VALUES (:title, :description, :cover_uri)";
+    $query = "INSERT INTO " . $this->table_name . "(title, description, cover_uri, user_id, is_private) VALUES (:title, :description, :cover_uri, :user_id, :is_private)";
 
     return $this->executeWithId($query, $data);
   }
 
   public function update($data)
   {
-    $query = "UPDATE " . $this->table_name . " SET title = :title, description = :description, cover_uri = :cover_uri WHERE id = :id";
+    $query = "UPDATE " . $this->table_name . " SET title = :title, description = :description, cover_uri = :cover_uri, user_id = :user_id, is_private = :is_private WHERE id = :id";
 
     return $this->execute($query, $data);
   }

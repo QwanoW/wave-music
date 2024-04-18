@@ -1,22 +1,30 @@
 import { reactive } from 'vue';
+import { AxiosError } from 'axios';
 
 import { hasToken, removeToken, setToken } from '@/lib/token';
 import api from '@/lib/axios';
-import { AxiosError } from 'axios';
-import { UserRole } from '@/constants/index';
-
-interface User {
-  id: number;
-  username: string;
-  email: string;
-  role: UserRole;
-  isArtist: boolean;
-  created_at: Date;
-}
+import { User } from '@/constants/types';
 
 interface UserStore {
   isAuthenticated: boolean;
   user?: User;
+
+  likedTracks: number[];
+  likedPlaylists: number[];
+  likedAlbums: number[];
+  likedArtists: number[];
+
+  likeTrack(id: number): Promise<void>;
+  unlikeTrack(id: number): Promise<void>;
+
+  likePlaylist(id: number): Promise<void>;
+  unlikePlaylist(id: number): Promise<void>;
+
+  likeAlbum(id: number): Promise<void>;
+  unlikeAlbum(id: number): Promise<void>;
+
+  likeArtist(id: number): Promise<void>;
+  unlikeArtist(id: number): Promise<void>;
 
   authorize(token: string): void;
 
@@ -37,6 +45,94 @@ export const userStore = reactive<UserStore>({
   isAuthenticated: hasToken(),
   user: undefined,
 
+  likedTracks: [],
+  likedPlaylists: [],
+  likedAlbums: [],
+  likedArtists: [],
+
+  async likeTrack(id: number) {
+    this.likedTracks.push(id);
+    try {
+      await api.get(`/user/likes/track?id=${id}&action=like`);
+    } catch (error) {
+      this.likedTracks = this.likedTracks.filter((likedId) => likedId !== id);
+      console.log(error);
+    }
+  },
+
+  async unlikeTrack(id: number) {
+    this.likedTracks = this.likedTracks.filter((likedId) => likedId !== id);
+    try {
+      await api.get(`/user/likes/track?id=${id}&action=unlike`);
+    } catch (error) {
+      console.log(error);
+      this.likedTracks.push(id);
+    }
+  },
+
+  async likePlaylist(id: number) {
+    this.likedPlaylists = this.likedPlaylists.filter((likedId) => likedId !== id);
+    try {
+      this.likedPlaylists.push(id);
+      await api.get(`/user/likes/playlist.php?id=${id}&action=like`);
+    } catch (error) {
+      this.likedPlaylists = this.likedPlaylists.filter((likedId) => likedId !== id);
+      console.log(error);
+    }
+  },
+
+  async unlikePlaylist(id: number) {
+    this.likedPlaylists = this.likedPlaylists.filter((likedId) => likedId !== id);
+    try {
+      await api.get(`/user/likes/playlist.php?id=${id}&action=unlike`);
+    } catch (error) {
+      console.log(error);
+      this.likedPlaylists.push(id);
+    }
+  },
+
+  async likeAlbum(id: number) {
+    this.likedAlbums = this.likedAlbums.filter((likedId) => likedId !== id);
+    try {
+      this.likedAlbums.push(id);
+      await api.get(`/user/likes/album.php?id=${id}&action=like`);
+    } catch (error) {
+      this.likedAlbums = this.likedAlbums.filter((likedId) => likedId !== id);
+      console.log(error);
+    }
+  },
+
+  async unlikeAlbum(id: number) {
+    this.likedAlbums = this.likedAlbums.filter((likedId) => likedId !== id);
+    try {
+      await api.get(`/user/likes/album.php?id=${id}&action=unlike`);
+    } catch (error) {
+      console.log(error);
+      this.likedAlbums.push(id);
+    }
+  },
+
+  async likeArtist(id: number) {
+    this.likedArtists = this.likedArtists.filter((likedId) => likedId !== id);
+    try {
+      this.likedArtists.push(id);
+      await api.get(`/user/likes/artist.php?id=${id}&action=like`);
+    } catch (error) {
+      this.likedArtists = this.likedArtists.filter((likedId) => likedId !== id);
+      console.log(error);
+    }
+  },
+
+  async unlikeArtist(id: number) {
+    this.likedArtists = this.likedArtists.filter((likedId) => likedId !== id);
+    try {
+      await api.get(`/user/likes/artist.php?id=${id}&action=unlike`);
+    } catch (error) {
+      console.log(error);
+      this.likedArtists.push(id);
+    }
+  },
+
   reset() {
     this.isAuthenticated = false;
     this.user = undefined;
@@ -49,7 +145,7 @@ export const userStore = reactive<UserStore>({
 
   async login(email: string, password: string) {
     try {
-      const response = await api.post('/auth/login.php', {
+      const response = await api.postForm('/auth/login.php', {
         email,
         password,
       });
@@ -72,7 +168,7 @@ export const userStore = reactive<UserStore>({
 
   async register(username: string, email: string, password: string) {
     try {
-      const response = await api.post('/auth/register.php', {
+      const response = await api.postForm('/auth/register.php', {
         username,
         email,
         password,
@@ -100,14 +196,24 @@ export const userStore = reactive<UserStore>({
 
 export const fetchUserData = async () => {
   try {
-    const response = await api.post('/user/validate_token.php');
+    const response = await api.post('/user/me.php');
 
     if (response.status !== 200) {
       userStore.reset();
       return;
     }
 
+    const { user, liked_tracks, liked_playlists, liked_albums, liked_artists } = response.data;
+
     userStore.isAuthenticated = true;
-    userStore.user = response.data.data;
-  } catch (error) {}
+    userStore.user = user;
+
+    userStore.likedTracks = liked_tracks.map((track: any) => track.track_id);
+    userStore.likedPlaylists = liked_playlists.map((playlist: any) => playlist.playlist_id);
+    userStore.likedAlbums = liked_albums.map((album: any) => album.album_id);
+    userStore.likedArtists = liked_artists.map((artist: any) => artist.artist_id);
+
+  } catch (error) {
+    console.log(error);
+  }
 };

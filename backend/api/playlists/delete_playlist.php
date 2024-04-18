@@ -1,22 +1,32 @@
 <?php
 require_once getenv('LANDO_MOUNT') . '/vendor/autoload.php';
 
-App\Middleware::admin_route();
+$user = App\Middleware::protect_route();
 
-if (isset($_POST['id'])) {
-  $id = $_POST['id'];
 
-  $db = new \App\Database();
-  $pdo = $db->getConnection();
 
-  $pdo->beginTransaction();
-
+if (isset($_GET['id'])) {
+  $id = $_GET['id'];
   try {
-    $albumDB = new \App\Objects\Playlist($pdo);
+    $db = new \App\Database();
+    $pdo = $db->getConnection();
+  
+    $pdo->beginTransaction();
 
-    $playlist = $albumDB->getById($id);
+    $playlistDB = new \App\Objects\Playlist($pdo);
+
+    $playlist = $playlistDB->getById($id);
+
+    if ($user->role !== App\UserRole::ADMIN->name || $user->id !== $playlist['user_id']) {
+      http_response_code(403);
+
+      echo json_encode([
+        'message' => 'Доступ запрещён',
+      ]);
+    }
+
     if ($playlist) {
-      $albumDB->delete($id);
+      $playlistDB->delete($id);
 
       $pdo->commit();
 

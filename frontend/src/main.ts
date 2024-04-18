@@ -1,10 +1,10 @@
 import { createApp } from 'vue';
-import { createRouter, createWebHistory } from 'vue-router/auto';
+import { createRouter, createWebHistory, DataLoaderPlugin } from 'vue-router/auto';
 
 import '@/style.css';
 import App from '@/App.vue';
 import { fetchUserData, userStore } from '@/stores/user';
-import { UserRole } from '@/constants';
+import { UserRole } from '@/constants/types';
 
 const router = createRouter({
   history: createWebHistory(),
@@ -37,4 +37,4 @@ router.beforeEach((to, _, next) => {
   next();
 });
 
-createApp(App).use(router).mount('#app');
+createApp(App).use(DataLoaderPlugin, { router }).use(router).mount('#app');

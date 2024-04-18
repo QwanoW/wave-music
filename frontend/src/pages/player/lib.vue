@@ -5,8 +5,10 @@ import libNav from '@/components/player/lib-nav.vue';
 </script>
 
 <template>
-  <libNav />
-  <RouterView />
+  <div class="w-full h-full flex flex-col gap-y-4 p-5">
+    <libNav />
+    <RouterView />
+  </div>
 </template>
 
 <style scoped></style>

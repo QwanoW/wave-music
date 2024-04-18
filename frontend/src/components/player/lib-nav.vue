@@ -5,12 +5,11 @@ const libRoutes = [
   { name: 'Плейлисты', path: '/player/lib/playlists' },
   { name: 'Исполнители', path: '/player/lib/artists' },
   { name: 'Альбомы', path: '/player/lib/albums' },
-  { name: 'Загрузки', path: '/player/lib/uploads' },
 ];
 </script>
 
 <template>
-  <nav class="w-full flex items-center space-x-2">
+  <nav class="w-full space-x-2">
     <RouterLink
       :class="route.path === $route.path ? 'bg-amber-600/30' : 'hover:bg-amber-600/15'"
       class="px-3 py-1 rounded-lg font-bold text-xl text-orange-600 cursor-pointer transition-all"

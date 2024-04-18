@@ -1,21 +1,23 @@
 <script setup lang="ts">
+import { AudioLines } from 'lucide-vue-next';
+
 import { userStore } from '@/stores/user';
-import { UserRole } from '@/constants/index';
+import { UserRole } from '@/constants/types';
 import UserButton from '@/components/partials/header/user-button.vue';
 </script>
 
 <template>
-  <div class="w-full bg-orange-100">
+  <header class="w-full bg-orange-100">
     <div
       class="max-w-6xl w-full px-6 mx-auto py-8 flex flex-col sm:flex-row justify-between items-center">
       <RouterLink to="/">
         <div class="flex items-center space-x-2">
-          <!-- <img class="w-10" src="../assets/gopher-logo.png" alt="" /> -->
-          <span class="font-bold text-2xl text-amber-800">Vue Music</span>
+          <AudioLines class="w-8 h-8 text-orange-500" />
+          <span class="font-bold text-2xl text-amber-800">Wave Music</span>
         </div>
       </RouterLink>
 
-      <div>
+      <nav>
         <ul class="flex space-x-3 items-center">
           <li class="font-medium text-amber-600 hover:text-amber-900 cursor-pointer transition-all">
             <RouterLink to="/blog">Блог</RouterLink>
@@ -49,9 +51,9 @@ import UserButton from '@/components/partials/header/user-button.vue';
             </li>
           </div>
         </ul>
-      </div>
+      </nav>
     </div>
-  </div>
+  </header>
 </template>
 
 <style scoped></style>

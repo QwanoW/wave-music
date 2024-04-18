@@ -19,7 +19,7 @@ defineProps<{
 <template>
   <Dialog>
     <DialogTrigger class="w-full">
-      <Button variant="outline">{{ triggerTitle }}</Button>
+      <Button class="w-full" variant="outline">{{ triggerTitle }}</Button>
     </DialogTrigger>
     <DialogScrollContent class="sm:max-w-[425px]">
       <DialogHeader>

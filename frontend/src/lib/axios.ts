@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import { useRouter } from 'vue-router/auto';
 import { useToast } from '@/components/ui/toast/use-toast';
 
@@ -48,6 +48,10 @@ api.interceptors.response.use(
         variant: 'destructive',
       });
       router.push('/auth/login');
+    }
+
+    if (error instanceof AxiosError && error.response) {
+      error.response.data.message = error.message;
     }
 
     return Promise.reject(error);

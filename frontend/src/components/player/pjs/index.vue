@@ -1,17 +1,33 @@
 <script setup lang="ts">
-import pjs from './loader';
+import pjs from '@/components/player/pjs/loader';
+import { audioStore } from '@/stores/audio';
 
-pjs.then(() => {
-  // @ts-ignore
-  let player = new Playerjs({
-    id: 'player',
-    file: 'http://cursach-backend.lndo.site/content/song/660ce3c092ef0/index.m3u8',
-  });
+import { onMounted, ref } from 'vue';
+
+onMounted(async () => {
+  await pjs;
+  audioStore.init();
+});
+
+const player = ref<HTMLElement | null>(null);
+
+onMounted(() => {
+  player.value?.addEventListener('new', () => {
+    audioStore.onChange();
+  })
+
+  player.value?.addEventListener('play', () => {
+    audioStore.isPlaying = true;
+  })
+
+  player.value?.addEventListener('pause', () => {
+    audioStore.isPlaying = false;
+  })
 });
 </script>
 
 <template>
-  <div id="player"></div>
+  <div ref="player" id="player"></div>
 </template>
 
 <style>
