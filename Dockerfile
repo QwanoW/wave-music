@@ -1,5 +1,7 @@
 FROM php:8.2-apache
 
+RUN echo "nameserver 8.8.8.8" > /etc/resolv.conf
+
 # Устанавливаем зависимости
 RUN apt-get -y update && \
     apt-get -y upgrade && \
