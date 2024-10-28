@@ -43,8 +43,6 @@ RUN cp -r /var/www/frontend/dist/* /var/www/html/
 # Возвращаемся в основную рабочую директорию
 WORKDIR /var/www
 
-RUN php migrate.php
-
 RUN composer install
 
 RUN composer dump-autoload

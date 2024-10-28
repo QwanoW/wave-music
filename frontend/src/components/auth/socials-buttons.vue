@@ -15,20 +15,13 @@ const onClickProvider = (provider: 'github' | 'google') => {
     isLoadingGoogle.value = true;
   }
 
-  const newWindow = window.open(
-    `${API_URL}/auth/oauth/${provider}.php`,
-    '_self',
-    'height=600,width=450',
-  );
-  if (window) {
-    newWindow?.focus();
-  }
+  window.location.href = `${API_URL}/auth/oauth/${provider}.php`;
 };
 </script>
 
 <template>
   <div class="w-full justify-between flex space-x-4">
     <GithubButton :isLoading="isLoadingGithub" @click="onClickProvider('github')" class="w-full" />
-    <GoogleButton :isLoading="isLoadingGoogle" @click="onClickProvider('google')" class="w-full" />
+    <GoogleButton :isLoading="isLoadingGoogle" class="w-full" />
   </div>
 </template>

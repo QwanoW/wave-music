@@ -10,7 +10,8 @@ defineProps<{
 </script>
 
 <template>
-  <Button variant="outline" type="button" :disabled="isLoading">
+  <!-- <Button variant="outline" type="button" :disabled="isLoading"> -->
+  <Button variant="outline" type="button" :disabled="true">
     <LoaderCircle v-if="isLoading" class="mr-2 h-4 w-4 animate-spin" />
     <GlobeIcon v-else class="mr-2 h-4 w-4" />
     Google
