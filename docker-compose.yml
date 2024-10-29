@@ -3,6 +3,7 @@ services:
     build: .
     volumes:
       - .:/app
+      - ./html/api/content:/var/www/html/api/content
     ports:
       - '80:80'
     env_file:
@@ -19,7 +20,7 @@ services:
     ports:
       - '3306:3306'
     volumes:
-      - ./database:/var/lib/mysql
+      - db-data:/var/lib/mysql
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
@@ -30,3 +31,6 @@ services:
       PMA_HOST: database
     depends_on:
       - database
+
+volumes:
+  db-data:

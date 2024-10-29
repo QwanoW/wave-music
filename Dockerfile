@@ -24,6 +24,11 @@ RUN a2enmod rewrite
 # Добавляем настройку для папки /var/www/html
 RUN sed -i '/<Directory \/var\/www\/>/,/<\/Directory>/ s/AllowOverride None/AllowOverride All/' /etc/apache2/apache2.conf
 
+# Копируем кастомный php.ini с увеличенными лимитами и настройками логирования
+COPY custom-php.ini $PHP_INI_DIR/
+
+RUN mv "$PHP_INI_DIR/custom-php.ini" "$PHP_INI_DIR/php.ini"
+
 # Устанавливаем рабочую директорию
 WORKDIR /var/www
 
@@ -42,6 +47,8 @@ RUN cp -r /var/www/frontend/dist/* /var/www/html/
 
 # Возвращаемся в основную рабочую директорию
 WORKDIR /var/www
+
+RUN chmod -R 777 /var/www/html/api/content
 
 RUN composer install
 
